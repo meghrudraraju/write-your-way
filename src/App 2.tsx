@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Toaster } from "./components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { AuthProvider, useAuth } from "./hooks/useAuth";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Layout from "./components/Layout";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Layout from "@/components/Layout";
 import LandingFrstUser from "./pages/Landing_frstUser";
 import Dashboard from "./pages/Dashboard";
 import AuthPage from "./pages/AuthPage";
@@ -12,9 +14,8 @@ import NotFound from "./pages/NotFound";
 import MoodSelect from "./pages/MoodSelect";
 import GenreQuestion from "./pages/GenreQuestion";
 import LanguageSelect from "./pages/LanguageSelect";
-import PreferenceSelect from "./pages/PreferenceSelect";
 import EditProfile from "./pages/EditProfile";
-import { OnboardingProvider } from "@/hooks/useOnboarding"; // 👈 import this
+import Loader from "@/components/Loader";
 
 // ✅ Wrap all logic inside a component that gets router context
 const AppRoutes = () => {
@@ -23,30 +24,19 @@ const AppRoutes = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-
-  // 🔍 Debug log to see current auth and onboarding status
-  console.log("user:", user, "loading:", loading, "onboardingComplete:", onboardingComplete);
-
-
-
   useEffect(() => {
     if (!loading && user) {
       const completed = user.hasCompletedOnboarding === true;
       setOnboardingComplete(completed);
 
       if (location.pathname === "/") {
-	navigate("/welcome", { replace: true });
+	navigate(completed ? "/" : "/welcome", { replace: true });
       }
     }
   }, [user, loading, location.pathname, navigate]);
 
   if (!loading && !user) {
-      return (
-    <Routes>
-      <Route path="/auth" element={<AuthPage />} />
-      <Route path="*" element={<AuthPage />} />
-    </Routes>
-  );
+    return <Routes><Route path="*" element={<AuthPage />} /></Routes>;
   }
 
   if (loading || (user && onboardingComplete === null)) {
@@ -66,11 +56,9 @@ const AppRoutes = () => {
       >
         <Route index element={onboardingComplete ? <Dashboard /> : <LandingFrstUser />} />
 	<Route path="welcome" element={<LandingFrstUser />} />
-	<Route path="dashboard" element={<Dashboard />} /> {/* ✅ This is what was missing */}
+        <Route path="mood" element={<MoodSelect />} />
         <Route path="genre" element={<GenreQuestion />} />
         <Route path="language" element={<LanguageSelect />} />
-        <Route path="preference" element={<PreferenceSelect />} />
-        <Route path="mood" element={<MoodSelect />} />
         <Route path="edit-profile" element={<EditProfile />} />
       </Route>
       <Route path="*" element={<NotFound />} />
@@ -81,16 +69,16 @@ const AppRoutes = () => {
 // ✅ Final App component
 const App = () => (
   <QueryClientProvider client={new QueryClient()}>
-     <AuthProvider>
-      <OnboardingProvider>
-         <Toaster />
-           <BrowserRouter>
-            <AppRoutes />
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppRoutes />
         </BrowserRouter>
-     </OnboardingProvider>	
+      </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
 
 export default App;
-

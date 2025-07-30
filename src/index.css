@@ -103,3 +103,34 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #C29D54;
+  border-radius: 10px;
+  border: 2px solid #000000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #b18b41;
+}
+
+.input-auth {
+  @apply w-full px-4 py-2 rounded border border-[#C29D54] bg-black text-[#C29D54] placeholder-[#C29D54]/50 focus:outline-none focus:ring-2 focus:ring-[#C29D54];
+}
+
+.btn-auth {
+  @apply w-full py-2 bg-[#C29D54] text-black font-semibold rounded hover:bg-[#b18b41] transition;
+}
+
+.btn-google {
+  @apply w-full py-2 border border-[#C29D54] text-[#C29D54] flex items-center justify-center gap-2 rounded hover:bg-[#C29D54]/10 transition;
+}

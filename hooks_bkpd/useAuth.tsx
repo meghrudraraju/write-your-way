@@ -14,12 +14,6 @@ interface AuthContextType {
   ) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-  patchUserProfile: (data: {
-    hasCompletedOnboarding: boolean;
-    genres: string[];
-    languages: string[];
-    preferred: string;
-  }) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,7 +27,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const res = await fetch("http://localhost:8000/api/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email, password }),
       });
 
@@ -58,6 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       const profile = await profileRes.json();
 
+      // ✅ Normalize backend snake_case to frontend camelCase
       const normalizedUser = {
         userId: profile.user_id,
         firstName: profile.first_name,
@@ -93,7 +90,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const res = await fetch("http://localhost:8000/api/signup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           email,
           password,
@@ -125,69 +124,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
-  const patchUserProfile = async ({
-    hasCompletedOnboarding,
-    genres,
-    languages,
-    preferred,
-  }: {
-    hasCompletedOnboarding: boolean;
-    genres: string[];
-    languages: string[];
-    preferred: string;
-  }) => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) return { error: { message: "Not authenticated" } };
-
-      const res = await fetch("http://localhost:8000/api/me", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          hasCompletedOnboarding,
-          genres,
-          languages,
-          preferred,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        return { error: { message: data.detail || "Update failed" } };
-      }
-
-      const data = await res.json();
-      setUser((prev: any) => ({
-        ...prev,
-        hasCompletedOnboarding: data.user.hasCompletedOnboarding,
-        genres: data.user.genres,
-        languages: data.user.languages,
-        preferred: data.user.preferred,
-      }));
-
-      return { error: null };
-    } catch (err) {
-      return { error: { message: "Something went wrong" } };
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        signIn,
-        signUp,
-        signInWithGoogle,
-        signOut,
-        patchUserProfile,
-      }}
+      value={{ user, loading, signIn, signUp, signInWithGoogle, signOut }}
     >
       {children}
     </AuthContext.Provider>

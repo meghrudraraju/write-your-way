@@ -1,0 +1,75 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const MoodSelect = () => {
+  const [selectedMood, setSelectedMood] = useState("");
+  const navigate = useNavigate();
+
+  const moods = [
+    { label: "😊 Happy", value: "happy" },
+    { label: "😔 Sad", value: "sad" },
+    { label: "😐 Neutral", value: "neutral" },
+  ];
+
+  return (
+    <div
+      className="w-screen h-screen bg-cover bg-center relative"
+      style={{
+        backgroundImage: `url("/assets/Landing_frstUser.svg")`,
+        backdropFilter: "blur(8px)",
+      }}
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0 backdrop-blur-sm bg-black/60" />
+
+      {/* Mood Selection Card */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-lg p-8 rounded-xl shadow-xl border border-[#C29D54] w-[90%] max-w-md z-10">
+        <h2 className="text-2xl font-bold mb-6 text-center text-[#C29D54]">
+          What’s your mood today?
+        </h2>
+
+        {/* Mood Buttons */}
+        <div className="flex flex-col gap-4">
+          {moods.map((mood) => (
+            <button
+              key={mood.value}
+              onClick={() => setSelectedMood(mood.value)}
+              className={`w-full py-3 rounded-md font-semibold text-lg border transition ${
+                selectedMood === mood.value
+                  ? "bg-[#C29D54] text-black border-[#C29D54]"
+                  : "bg-black text-[#C29D54] border-[#C29D54] hover:bg-[#1a1a1a]"
+              }`}
+            >
+              {mood.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Footer: Clear + Arrow */}
+        <div className="flex justify-between items-center mt-6">
+          <button
+            onClick={() => setSelectedMood("")}
+            className="text-sm text-[#C29D54] hover:text-[#b18b41] transition"
+          >
+            Clear
+          </button>
+
+          <button
+            onClick={() => selectedMood && navigate("/next-onboarding")}
+            disabled={!selectedMood}
+            className={`text-3xl font-bold transition ${
+              selectedMood
+                ? "text-[#C29D54] hover:text-[#b18b41]"
+                : "text-[#C29D54]/30 cursor-not-allowed"
+            }`}
+            title={selectedMood ? "Next" : "Select mood first"}
+          >
+            →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MoodSelect;

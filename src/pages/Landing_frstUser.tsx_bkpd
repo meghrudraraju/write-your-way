@@ -1,0 +1,39 @@
+import { useNavigate } from "react-router-dom";
+const Landing = () => {
+  const navigate = useNavigate();
+
+  return (
+  <div className="relative w-full h-screen">
+      {/* Profile Icon at top-right */}
+      <button
+        onClick={() => navigate("/profile")}
+        className="absolute top-4 right-4 z-20 hover:scale-105 transition"
+        title="Your Profile"
+      >
+        <img
+          src="/assets/Profile_Icon.svg"
+          alt="Profile"
+          className="w-8 h-8"
+        />
+      </button>    
+   <div className="w-screen h-screen overflow-hidden bg-black relative">
+      {/* Centered image */}
+      <img
+        src="/assets/Landing_frstUser.svg"
+        alt="Landing"
+        className="w-full h-full object-cover"
+      />
+
+      {/* CTA Overlay */}
+      <button
+        onClick={() => navigate("/mood")}
+        className="absolute top-[60%] left-1/2 -translate-x-1/2 bg-[#C29D54] text-black text-lg px-6 py-3 rounded-md font-semibold hover:bg-[#b18b41] transition"
+      >
+        Begin Now
+      </button>
+    </div>
+  </div>
+  );
+};
+
+export default Landing;

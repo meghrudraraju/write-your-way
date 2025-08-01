@@ -7,6 +7,8 @@ interface OnboardingContextType {
   setLanguages: (l: string[]) => void;
   mood: string;
   setMood: (m: string) => void;
+  onboardingComplete: boolean;
+  setOnboardingComplete: (status: boolean) => void;
   reset: () => void;
 }
 
@@ -16,16 +18,28 @@ export const OnboardingProvider = ({ children }: { children: React.ReactNode }) 
   const [genres, setGenres] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   const [mood, setMood] = useState<string>("");
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false); // ✅
 
   const reset = () => {
     setGenres([]);
     setLanguages([]);
     setMood("");
+    setOnboardingComplete(false); // ✅ reset onboarding too
   };
 
   return (
     <OnboardingContext.Provider
-      value={{ genres, setGenres, languages, setLanguages, mood, setMood, reset }}
+      value={{
+        genres,
+        setGenres,
+        languages,
+        setLanguages,
+        mood,
+        setMood,
+        onboardingComplete,
+        setOnboardingComplete, // ✅ exposed
+        reset,
+      }}
     >
       {children}
     </OnboardingContext.Provider>

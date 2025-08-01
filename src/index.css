@@ -134,3 +134,25 @@ All colors MUST be HSL.
 .btn-google {
   @apply w-full py-2 border border-[#C29D54] text-[#C29D54] flex items-center justify-center gap-2 rounded hover:bg-[#C29D54]/10 transition;
 }
+
+.perspective {
+  perspective: 1000px;
+}
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: black; /* Fallback color */
+}

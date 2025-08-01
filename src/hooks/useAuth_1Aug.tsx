@@ -1,21 +1,7 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-import { createContext, useContext, useEffect, useState } from "react";
-
-interface User {
-  userId: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  dob?: string;
-  pincode?: string;
-  hasCompletedOnboarding: boolean;
-  genres?: string;
-  languages?: string;
-  preferred?: string;
-}
+import { createContext, useContext, useState } from "react";
 
 interface AuthContextType {
-  user: User | null;
+  user: any;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (
@@ -40,60 +26,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true); // ✅ initially loading
-
-  // ✅ Rehydrate user on mount
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchUser = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/api/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!res.ok) {
-          setUser(null);
-          return;
-        }
-
-        const profile = await res.json();
-        const normalizedUser = {
-          userId: profile.user_id,
-          firstName: profile.first_name,
-          lastName: profile.last_name,
-          username: profile.username,
-          email: profile.email,
-          dob: profile.dob,
-          pincode: profile.pincode,
-          hasCompletedOnboarding:
-            profile.hasCompletedOnboarding ?? profile.has_completed_onboarding,
-          genres: profile.genres ?? profile.preferred_genres,
-          languages: profile.languages ?? profile.preferred_languages,
-          preferred: profile.preferred ?? profile.preferred_mood,
-        };
-
-        setUser(normalizedUser);
-        console.log("🔁 Rehydrated user on reload:", normalizedUser);
-      } catch (err) {
-        setUser(null);
-        console.error("❌ Failed to rehydrate user", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`${BASE_URL}/api/login`, {
+      const res = await fetch("http://localhost:8000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -107,7 +45,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const data = await res.json();
       localStorage.setItem("access_token", data.access_token);
 
-      const profileRes = await fetch(`${BASE_URL}/api/me`, {
+      const profileRes = await fetch("http://localhost:8000/api/me", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${data.access_token}`,
@@ -136,7 +74,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       };
 
       setUser(normalizedUser);
-      console.log("✅ Auth User Set:", normalizedUser);
       return { error: null };
     } catch (err) {
       return { error: { message: "Something went wrong" } };
@@ -154,7 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     pincode?: string
   ) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/signup`, {
+      const res = await fetch("http://localhost:8000/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -204,7 +141,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const token = localStorage.getItem("access_token");
       if (!token) return { error: { message: "Not authenticated" } };
 
-      const res = await fetch(`${BASE_URL}/api/me`, {
+      const res = await fetch("http://localhost:8000/api/me", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

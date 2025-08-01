@@ -7,16 +7,15 @@ const instance = axios.create({
 
 // Add Authorization header with Bearer token
 instance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("access_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    console.log("Added Authorization Header:", config.headers.Authorization); // 👈 temp debug
-  }else {
-    console.log("⚠️ [axios] No token found in localStorage."); // 👈 Debug fallback }
+    console.log("✅ [axios] Added Authorization Header:", config.headers.Authorization);
+  } else {
+    console.log("⚠️ [axios] No token found in localStorage.");
+  }
 
   return config;
-};
+});
 
 export default instance;
-
-

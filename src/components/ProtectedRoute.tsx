@@ -2,11 +2,18 @@
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useOnboarding } from "@/hooks/useOnboarding";
+
+const onboardingPaths = [
+  "/welcome",
+  "/genre",
+  "/language",
+  "/preference",
+  "/mood",
+  "/edit-profile",
+];
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
-  const { onboardingComplete } = useOnboarding();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -15,14 +22,18 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
       !loading &&
       user &&
       !user.hasCompletedOnboarding &&
-      location.pathname !== "/welcome"
     ) {
       console.log("🔁 Redirecting to /welcome from:", location.pathname);
       navigate("/welcome", { replace: true });
     }
-  }, [user, loading, location.pathname]);
+  }, [user, loading, location.pathname,navigate]);
 
-  if (loading || (user && !user.hasCompletedOnboarding && location.pathname !== "/welcome")) {
+  if (
+    loading ||
+    (user &&
+      !user.hasCompletedOnboarding &&
+      !onboardingPaths.includes(location.pathname))
+  ) {
     return (
       <div className="text-white text-center mt-20">
         Loading your First Screen before welcome screen...
@@ -34,14 +45,6 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Final fallback loading screen if already on /welcome
-  if (location.pathname === "/welcome" && !user.hasCompletedOnboarding) {
-    return (
-      <div className="text-white text-center mt-20">
-        Loading your welcome screen...
-      </div>
-    );
-  }
 
   return children;
 };

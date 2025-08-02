@@ -65,7 +65,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="/welcome" element={<LandingFrstUser />} />
+        <Route path="welcome" element={<LandingFrstUser />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="genre" element={<GenreQuestion />} />
         <Route path="language" element={<LanguageSelect />} />

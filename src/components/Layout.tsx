@@ -19,7 +19,6 @@ const Layout = () => {
 
       {/* Main scrollable content */}
 <main className="relative z-10 w-full min-h-screen text-white">
-  <p className="p-4">📍 Inside Layout → Outlet starts below</p>
   <Outlet />
 </main>
     </div>

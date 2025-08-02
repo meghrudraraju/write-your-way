@@ -21,8 +21,8 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     if (
       !loading &&
       user &&
-      !user.hasCompletedOnboarding
-    ) {
+      !user.hasCompletedOnboarding &&
+      !onboardingPaths.includes(location.pathname)    ) {
       console.log("🔁 Redirecting to /welcome from:", location.pathname);
       navigate("/welcome", { replace: true });
     }

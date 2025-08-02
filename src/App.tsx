@@ -1,8 +1,16 @@
-import { useEffect, useState } from "react";
+// src/App.tsx
+import { useEffect } from "react";
 import { Toaster } from "./components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
+import { OnboardingProvider, useOnboarding } from "@/hooks/useOnboarding";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Layout from "./components/Layout";
 import LandingFrstUser from "@/pages/Landing_frstUser";
@@ -14,38 +22,29 @@ import GenreQuestion from "./pages/GenreQuestion";
 import LanguageSelect from "./pages/LanguageSelect";
 import PreferenceSelect from "./pages/PreferenceSelect";
 import EditProfile from "./pages/EditProfile";
-import { OnboardingProvider } from "@/hooks/useOnboarding"; // 👈 import this
-import { useOnboarding } from "@/hooks/useOnboarding";
 
-// ✅ Wrap all logic inside a component that gets router context
+// ✅ AppRoutes uses hooks (must be inside Router)
 const AppRoutes = () => {
   const { user, loading } = useAuth();
   const { onboardingComplete, setOnboardingComplete } = useOnboarding();
   const location = useLocation();
-  const navigate = useNavigate(); // ✅ Fix added
+  const navigate = useNavigate();
 
-  // 🔍 Debug log to see current auth and onboarding status
-  console.log("user:", user, "loading:", loading, "onboardingComplete:", onboardingComplete);
+  useEffect(() => {
+    console.log("📍 useEffect running. Pathname:", location.pathname);
+    if (!loading && user) {
+      const completed = user.hasCompletedOnboarding === true;
+      setOnboardingComplete(completed);
 
+      if (location.pathname === "/") {
+        navigate(completed ? "/dashboard" : "/welcome", { replace: true });
+      }
 
-useEffect(() => {
-  if (!loading && user) {
-    const completed = user.hasCompletedOnboarding === true;
-    setOnboardingComplete(completed);
-
-    if (location.pathname === "/") {
-      if (completed) {
+      if (completed && location.pathname === "/welcome") {
         navigate("/dashboard", { replace: true });
-      } else {
-        navigate("/welcome", { replace: true });
       }
     }
-
-    if (completed && location.pathname === "/welcome") {
-      navigate("/dashboard", { replace: true });
-    }
-  }
-}, [user, loading, location.pathname, navigate]);
+  }, [user, loading, location.pathname, navigate]);
 
   if (loading || (user && onboardingComplete === null)) {
     return <div className="text-white p-10">Loading...</div>;
@@ -53,7 +52,11 @@ useEffect(() => {
 
   return (
     <Routes>
+      {/* 🔓 Public Routes (no ProtectedRoute) */}
       <Route path="/auth" element={<AuthPage />} />
+
+
+      {/* 🔐 Protected Routes */}
       <Route
         path="/"
         element={
@@ -62,33 +65,33 @@ useEffect(() => {
           </ProtectedRoute>
         }
       >
-        <Route index element={onboardingComplete ? <Dashboard /> : <LandingFrstUser />} />
-	      <Route path="welcome" element={<LandingFrstUser />} />
-	      <Route path="dashboard" element={<Dashboard />} /> {/* ✅ This is what was missing */}
+        <Route path="/welcome" element={<LandingFrstUser />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="genre" element={<GenreQuestion />} />
         <Route path="language" element={<LanguageSelect />} />
         <Route path="preference" element={<PreferenceSelect />} />
         <Route path="mood" element={<MoodSelect />} />
         <Route path="edit-profile" element={<EditProfile />} />
       </Route>
+
+      {/* ❌ 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
 
-// ✅ Final App component
+// ✅ Final App wrapper
 const App = () => (
   <QueryClientProvider client={new QueryClient()}>
-     <AuthProvider>
+    <AuthProvider>
       <OnboardingProvider>
-         <Toaster />
-           <BrowserRouter>
-            <AppRoutes />
+        <Toaster />
+        <BrowserRouter>
+          <AppRoutes />
         </BrowserRouter>
-     </OnboardingProvider>	
+      </OnboardingProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
 
 export default App;
-

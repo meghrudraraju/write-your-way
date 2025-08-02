@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import ProfileDropdown from "./ProfileDropdown";
-
 const Layout = () => {
   return (
     <div className="relative w-full min-h-screen bg-black text-[#C29D54]">
@@ -19,9 +18,10 @@ const Layout = () => {
       </header>
 
       {/* Main scrollable content */}
-      <main className="relative z-10 w-full min-h-screen">
-        <Outlet />
-      </main>
+<main className="relative z-10 w-full min-h-screen text-white">
+  <p className="p-4">📍 Inside Layout → Outlet starts below</p>
+  <Outlet />
+</main>
     </div>
   );
 };

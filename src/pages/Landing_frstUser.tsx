@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
 
-const Landing = () => {
+const LandingFrstUser = () => {
   const navigate = useNavigate();
-
+  console.log("✅ Landing_frstUser component rendered");
+ 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-black">
-      {/* Background Image */}
+     {/* Background Image */}
       <img
         src="/assets/Landing_frstUser.svg"
         alt="Landing"
@@ -23,4 +24,4 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+export default LandingFrstUser;

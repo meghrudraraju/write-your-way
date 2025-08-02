@@ -1,25 +1,48 @@
 // src/components/ProtectedRoute.tsx
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useOnboarding } from "@/hooks/useOnboarding";
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
+  const { onboardingComplete } = useOnboarding();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  if (loading) {
-    return <div className="text-white text-center mt-20">Loading...</div>;
+  useEffect(() => {
+    if (
+      !loading &&
+      user &&
+      !user.hasCompletedOnboarding &&
+      location.pathname !== "/welcome"
+    ) {
+      console.log("🔁 Redirecting to /welcome from:", location.pathname);
+      navigate("/welcome", { replace: true });
+    }
+  }, [user, loading, location.pathname]);
+
+  if (loading || (user && !user.hasCompletedOnboarding && location.pathname !== "/welcome")) {
+    return (
+      <div className="text-white text-center mt-20">
+        Loading your First Screen before welcome screen...
+      </div>
+    );
   }
 
-  console.log("👤 ProtectedRoute user object:", user);
-
-  // User not logged in
-  if (!user) return <Navigate to="/auth" replace />;
-
-  // Onboarding not completed → redirect to onboarding screen
-  if (!user.hasCompletedOnboarding) {
-    return <Navigate to="/welcome" replace />;
+  if (!user) {
+    return <Navigate to="/auth" replace />;
   }
 
-  // Authenticated and completed onboarding
+  // Final fallback loading screen if already on /welcome
+  if (location.pathname === "/welcome" && !user.hasCompletedOnboarding) {
+    return (
+      <div className="text-white text-center mt-20">
+        Loading your welcome screen...
+      </div>
+    );
+  }
+
   return children;
 };
 

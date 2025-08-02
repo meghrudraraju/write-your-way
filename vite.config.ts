@@ -4,6 +4,7 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  envPrefix: "VITE_", // ✅ makes sure VITE_ variables are picked up
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

@@ -34,13 +34,9 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
       !user.hasCompletedOnboarding &&
       !onboardingPaths.includes(location.pathname))
   ) {
-    return (
-      <div className="text-white text-center mt-20">
-        Loading your First Screen before welcome screen...
-      </div>
-    );
+    console.log("🔁 Redirecting to /welcome from:", location.pathname);
+    return <Navigate to="/welcome" replace />;
   }
-
   if (!user) {
     return <Navigate to="/auth" replace />;
   }

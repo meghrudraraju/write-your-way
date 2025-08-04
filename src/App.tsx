@@ -1,6 +1,5 @@
 // src/App.tsx
 import { useEffect } from "react";
-import { Toaster } from "./components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   BrowserRouter,
@@ -22,6 +21,11 @@ import GenreQuestion from "./pages/GenreQuestion";
 import LanguageSelect from "./pages/LanguageSelect";
 import PreferenceSelect from "./pages/PreferenceSelect";
 import EditProfile from "./pages/EditProfile";
+import InterventionMood from "@/components/InterventionMood"
+import { Toaster } from 'react-hot-toast';
+
+
+console.log("🌐 Page Load — sessionStorage.hasShownIntervention =", sessionStorage.getItem("hasShownIntervention"));
 
 // ✅ AppRoutes uses hooks (must be inside Router)
 const AppRoutes = () => {
@@ -67,6 +71,7 @@ const AppRoutes = () => {
       >
         <Route path="welcome" element={<LandingFrstUser />} />
         <Route path="dashboard" element={<Dashboard />} />
+	      <Route path="intervention-mood" element={<InterventionMood />} />
         <Route path="genre" element={<GenreQuestion />} />
         <Route path="language" element={<LanguageSelect />} />
         <Route path="preference" element={<PreferenceSelect />} />
@@ -87,6 +92,7 @@ const App = () => (
       <OnboardingProvider>
         <Toaster />
         <BrowserRouter>
+          <Toaster position="top-center" reverseOrder={false} />
           <AppRoutes />
         </BrowserRouter>
       </OnboardingProvider>

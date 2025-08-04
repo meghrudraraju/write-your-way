@@ -2,6 +2,8 @@ import { useState } from "react";
 import { LogIn } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
 
 const AuthPage = () => {
   const { signIn, signUp, signInWithGoogle } = useAuth();
@@ -36,10 +38,16 @@ const AuthPage = () => {
       form.email,
       form.password,
       form.firstName,
-      form.lastName
+      form.lastName,
+      form.dob,
+      form.pincode
     );
-    if (error) setError(error.message);
-    else navigate("/");
+    if (error) 
+      {setError(error.message);
+        return;}
+      
+    toast.success("🎉 Signup successful! Please log in.");
+    navigate("/auth");
   };
 
   const handleGoogleLogin = async () => {

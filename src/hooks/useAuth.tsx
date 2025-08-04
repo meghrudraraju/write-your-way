@@ -91,6 +91,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    console.log("Removing sessionStorage"
+    );
+    sessionStorage.removeItem("hasShownIntervention");
     setLoading(true);
     try {
       const res = await fetch(`${BASE_URL}/api/login`, {
@@ -150,8 +153,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     password: string,
     firstName: string,
     lastName: string,
-    dob?: string,
-    pincode?: string
+    dob: string,
+    pincode: string
   ) => {
     try {
       const res = await fetch(`${BASE_URL}/api/signup`, {
@@ -184,8 +187,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
+      console.log("🚪 Logging out: clearing sessionStorage...");
+    sessionStorage.removeItem("hasShownIntervention");
     localStorage.clear();
     setUser(null);
+    window.location.href = "/auth"; // ← full page reload to clear sessionStorage memory
+
   };
 
   const patchUserProfile = async ({

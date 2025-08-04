@@ -1,13 +1,10 @@
 import { useState } from "react";
+import axios from "@/lib/axios";
 import { useNavigate } from "react-router-dom";
-import { useOnboarding } from "@/hooks/useOnboarding";
-import { useAuth } from "@/hooks/useAuth";
 
-const MoodSelect = () => {
+const InterventionMood = () => {
   const [selectedMood, setSelectedMood] = useState("");
   const navigate = useNavigate();
-  const { genres, languages, setMood } = useOnboarding(); // ✅ use correct setters
-  const { patchUserProfile } = useAuth();
 
   const moods = [
     {
@@ -37,27 +34,29 @@ const MoodSelect = () => {
   const handleSubmit = async () => {
     if (!selectedMood) return;
 
-    setMood(selectedMood); // ✅ save to context
-
-    const { error } = await patchUserProfile({
-      hasCompletedOnboarding: true,
-      genres,
-      languages,
-      preferred: selectedMood,
-    });
-
-    if (!error) {
-      // ✅ Mark intervention as shown
-      console.log("Onboarding completed for First time user, setting Shown Intervention and navigating to Dashboard")
-      sessionStorage.setItem("hasShownIntervention", "true");
+    const token = localStorage.getItem("access_token");
+    try {
+      await axios.post(
+        "/api/user/mood",
+        { preferred_mood: selectedMood },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Navigating to dashboard after mood selection");
+      localStorage.setItem("hasCompletedMoodSelection", "true");
       navigate("/dashboard");
+    } catch (error) {
+      console.error("Failed to update mood:", error);
     }
   };
 
   return (
-    <div className="w-full h-screen bg-black overflow-x-hidden">
+    <div className="w-full h-screen bg-black">
       <div
-        className="w-screen h-screen bg-cover bg-center relative"
+        className="w-full h-full bg-cover bg-center relative"
         style={{
           backgroundImage: `url("/assets/Website_Background.svg")`,
         }}
@@ -70,7 +69,7 @@ const MoodSelect = () => {
 
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-lg p-8 rounded-xl shadow-xl border border-[#C29D54] w-[90%] max-w-md z-10">
           <h2 className="text-2xl font-bold mb-6 text-center text-[#C29D54]">
-            What’s your mood today?
+            Howdy! How are you feeling today?
           </h2>
 
           <div className="flex justify-between gap-4 mb-6">
@@ -97,26 +96,17 @@ const MoodSelect = () => {
             })}
           </div>
 
-          <div className="mt-6 flex justify-between items-center">
-            <button
-              onClick={() => navigate(-1)}
-              className="w-10 h-10 rounded-full border border-[#C29D54] text-[#C29D54] hover:text-black hover:bg-[#C29D54] transition"
-              title="Back"
-            >
-              ←
-            </button>
-
+          <div className="mt-6 flex justify-end">
             <button
               onClick={handleSubmit}
               disabled={!selectedMood}
-              className={`w-10 h-10 rounded-full border text-2xl font-bold transition flex items-center justify-center ${
+              className={`px-6 py-2 rounded-full border text-sm font-semibold transition ${
                 selectedMood
                   ? "border-[#C29D54] text-[#C29D54] hover:bg-[#C29D54] hover:text-black"
                   : "border-[#C29D54]/30 text-[#C29D54]/30 cursor-not-allowed"
               }`}
-              title={selectedMood ? "Next" : "Select mood first"}
             >
-              →
+              Submit
             </button>
           </div>
         </div>
@@ -125,4 +115,4 @@ const MoodSelect = () => {
   );
 };
 
-export default MoodSelect;
+export default InterventionMood;

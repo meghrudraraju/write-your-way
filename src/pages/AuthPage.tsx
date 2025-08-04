@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-
 const AuthPage = () => {
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
@@ -15,13 +14,15 @@ const AuthPage = () => {
     password: "",
     firstName: "",
     lastName: "",
-    dob: "",
-    pincode: "",
+    ageGroup: "",
+    location: "",
   });
 
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -39,13 +40,14 @@ const AuthPage = () => {
       form.password,
       form.firstName,
       form.lastName,
-      form.dob,
-      form.pincode
+      form.ageGroup,
+      form.location
     );
-    if (error) 
-      {setError(error.message);
-        return;}
-      
+    if (error) {
+      setError(error.message || "Signup failed.");
+      return;
+    }
+
     toast.success("🎉 Signup successful! Please log in.");
     navigate("/auth");
   };
@@ -60,16 +62,14 @@ const AuthPage = () => {
       className="w-screen h-screen bg-cover bg-center relative text-[#C29D54]"
       style={{ backgroundImage: 'url("/assets/Website_Background.svg")' }}
     >
-      {/* Blurred overlay */}
       <img
         src="/assets/Blur_BG.svg"
         alt="Blur Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
 
-      {/* Page Content */}
       <div className="relative z-10 flex flex-col md:flex-row h-full">
-        {/* Left Panel – Branding Copy */}
+        {/* Left Panel */}
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 text-center">
           <h1 className="text-4xl font-bold">What2Watch</h1>
           <p className="mt-4 text-lg text-[#C29D54]/90">Your taste. Your vibe. Your watchlist.</p>
@@ -81,9 +81,8 @@ const AuthPage = () => {
           <p className="mt-6 text-sm text-[#C29D54]/70">Spend less time browsing, more time watching.</p>
         </div>
 
-        {/* Right Panel – Login/Signup Form */}
+        {/* Right Panel */}
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-8">
-          {/* Tab Switch */}
           <div className="flex gap-6 mb-8">
             <button
               onClick={() => setIsLogin(true)}
@@ -111,7 +110,6 @@ const AuthPage = () => {
             <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
           )}
 
-          {/* Form */}
           {isLogin ? (
             <div className="w-full max-w-sm space-y-5">
               <input
@@ -166,19 +164,23 @@ const AuthPage = () => {
                 onChange={handleChange}
                 className="input-auth"
               />
-              <input
-                type="date"
-                name="dob"
-                placeholder="DOB"
-                value={form.dob}
+              <select
+                name="ageGroup"
+                value={form.ageGroup}
                 onChange={handleChange}
                 className="input-auth"
-              />
+              >
+                <option value="">Select Age Group</option>
+                <option value="teen">Under 18</option>
+                <option value="young_adult">18–29</option>
+                <option value="adult">30–44</option>
+                <option value="senior">45+</option>
+              </select>
               <input
                 type="text"
-                name="pincode"
-                placeholder="Pincode"
-                value={form.pincode}
+                name="location"
+                placeholder="Location (e.g., Mumbai, Delhi)"
+                value={form.location}
                 onChange={handleChange}
                 className="input-auth"
               />

@@ -6,8 +6,8 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
-  dob?: string;
-  pincode?: string;
+  ageGroup: string;
+  location: string;
   hasCompletedOnboarding: boolean;
   genres?: string;
   languages?: string;
@@ -23,8 +23,8 @@ interface AuthContextType {
     password: string,
     firstName: string,
     lastName: string,
-    dob?: string,
-    pincode?: string
+    ageGroup: string,
+    location: string
   ) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -68,8 +68,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           lastName: profile.last_name,
           username: profile.username,
           email: profile.email,
-          dob: profile.dob,
-          pincode: profile.pincode,
+          ageGroup: profile.ageGroup,
+          location: profile.location,
           hasCompletedOnboarding:
             profile.hasCompletedOnboarding ?? profile.has_completed_onboarding,
           genres: profile.genres ?? profile.preferred_genres,
@@ -129,8 +129,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         lastName: profile.last_name,
         username: profile.username,
         email: profile.email,
-        dob: profile.dob,
-        pincode: profile.pincode,
+        ageGroup: profile.ageGroup,
+        location: profile.location,
         hasCompletedOnboarding:
           profile.hasCompletedOnboarding ?? profile.has_completed_onboarding,
         genres: profile.genres ?? profile.preferred_genres,
@@ -166,8 +166,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           first_name: firstName,
           last_name: lastName,
           username: email.split("@")[0],
-          dob,
-          pincode,
+          ageGroup,
+          location,
         }),
       });
 

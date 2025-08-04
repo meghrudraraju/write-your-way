@@ -14,18 +14,30 @@ const allLanguages = [
   "Any language with English subtitles",
 ];
 
+interface FormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+  ageGroup: string;
+  location: string;
+  genres: string[];
+  languages: string[];
+  preferred: string;
+  hasCompletedOnboarding: boolean;
+}
+
 const EditProfile = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     firstName: "",
     lastName: "",
     email: "",
-    dob: "",
-    pincode: "",
-    genres: [] as string[],
-    languages: [] as string[],
+    ageGroup: "",
+    location: "",
+    genres: [],
+    languages: [],
     preferred: "",
     hasCompletedOnboarding: false, // ✅ added here
   });
@@ -46,8 +58,8 @@ useEffect(() => {
         firstName: user.first_name || "",
         lastName: user.last_name || "",
         email: user.email || "",
-        dob: user.dob || "",
-        pincode: user.pincode || "",
+        ageGroup: user.ageGroup || "",
+        location: user.location || "",
         genres: user.genres ? user.genres.split(",") : [],
         languages: user.languages ? user.languages.split(",") : [],
         preferred: user.preferred?.replace(/"/g, "") || "",
@@ -135,13 +147,13 @@ const handleSave = async () => {
         <h2 className="text-2xl font-bold mb-6 text-center">Edit Your Profile</h2>
 
         <div className="space-y-4">
-          {["firstName", "lastName", "email", "dob", "pincode"].map((field) => (
+          {(["firstName", "lastName", "email", "ageGroup", "location"] as (keyof FormState)[]).map((field) => (
             <input
               key={field}
               name={field}
-              type={field === "dob" ? "date" : field === "email" ? "email" : "text"}
+              type={field === "email" ? "email" : "text"}
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-              value={(form as any)[field]}
+              value={form[field]}
               readOnly
               className="w-full px-4 py-2 rounded-md border border-[#C29D54] bg-black text-[#C29D54] cursor-not-allowed opacity-60"
             />

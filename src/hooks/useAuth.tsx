@@ -153,8 +153,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     password: string,
     firstName: string,
     lastName: string,
-    dob: string,
-    pincode: string
+    ageGroup: string,
+    location: string
   ) => {
     try {
       const res = await fetch(`${BASE_URL}/api/signup`, {

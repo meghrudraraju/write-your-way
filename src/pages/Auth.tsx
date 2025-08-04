@@ -13,8 +13,8 @@ const AuthPage = () => {
     password: "",
     firstName: "",
     lastName: "",
-    dob: "",
-    pincode: "",
+    ageGroup: "",
+    location: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -147,19 +147,23 @@ const AuthPage = () => {
               onChange={handleChange}
               className="input-auth"
             />
-            <input
-              type="date"
-              name="dob"
-              placeholder="DOB"
-              value={form.dob}
+            <select
+              name="ageGroup"
+              value={form.ageGroup}
               onChange={handleChange}
               className="input-auth"
-            />
+                      >
+              <option value="">Select Age Group</option>
+              <option value="teen">Under 18</option>
+              <option value="young_adult">18–29</option>
+              <option value="adult">30–44</option>
+              <option value="senior">45+</option>
+            </select>
             <input
               type="text"
-              name="pincode"
-              placeholder="Pincode"
-              value={form.pincode}
+              name="location"
+              placeholder="Location (e.g., Mumbai, Delhi)"
+              value={form.location}
               onChange={handleChange}
               className="input-auth"
             />

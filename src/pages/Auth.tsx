@@ -19,7 +19,9 @@ const AuthPage = () => {
 
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -36,7 +38,9 @@ const AuthPage = () => {
       form.email,
       form.password,
       form.firstName,
-      form.lastName
+      form.lastName,
+      form.ageGroup,
+      form.location
     );
     if (error) setError(error.message);
     else navigate("/");

@@ -1,5 +1,6 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 import { createContext, useContext, useEffect, useState } from "react";
+import { toSnakeCaseKeys } from "@/lib/utils";
 
 interface User {
   userId: number;
@@ -17,29 +18,33 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (
+  signIn: (
+    email: string,
+    password: string
+  ) => Promise<{ error: unknown }>;  signUp: (
     email: string,
     password: string,
     firstName: string,
     lastName: string,
     ageGroup: string,
     location: string
-  ) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
+  ) => Promise<{ error: unknown }>;
+  signInWithGoogle: () => Promise<{ error: unknown }>;
   signOut: () => Promise<void>;
   patchUserProfile: (data: {
-    hasCompletedOnboarding: boolean;
-    genres: string[];
-    languages: string[];
-    preferred: string;
-  }) => Promise<{ error: any }>;
+    hasCompletedOnboarding?: boolean;
+    genres?: string[];
+    languages?: string[];
+    preferred?: string;
+    ageGroup?: string;
+    location?: string;
+  }) => Promise<{ error: unknown }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true); // ✅ initially loading
 
   // ✅ Rehydrate user on mount
@@ -68,8 +73,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           lastName: profile.last_name,
           username: profile.username,
           email: profile.email,
-          ageGroup: profile.ageGroup,
-          location: profile.location,
+          ageGroup: profile.ageGroup ?? profile.age_group,
+          location: profile.location ?? profile.locationName ?? profile.location_name,
           hasCompletedOnboarding:
             profile.hasCompletedOnboarding ?? profile.has_completed_onboarding,
           genres: profile.genres ?? profile.preferred_genres,
@@ -99,7 +104,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await fetch(`${BASE_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(toSnakeCaseKeys({ email, password })),
       });
 
       if (!res.ok) {
@@ -129,8 +134,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         lastName: profile.last_name,
         username: profile.username,
         email: profile.email,
-        ageGroup: profile.ageGroup,
-        location: profile.location,
+        ageGroup: profile.ageGroup ?? profile.age_group,
+        location: profile.location ?? profile.locationName ?? profile.location_name,
         hasCompletedOnboarding:
           profile.hasCompletedOnboarding ?? profile.has_completed_onboarding,
         genres: profile.genres ?? profile.preferred_genres,
@@ -148,39 +153,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const signUp = async (
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-    ageGroup: string,
-    location: string
-  ) => {
-    try {
-      const res = await fetch(`${BASE_URL}/api/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+const signUp = async (
+  email: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+  ageGroup: string,
+  location: string
+) => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(
+        toSnakeCaseKeys({
           email,
           password,
-          first_name: firstName,
-          last_name: lastName,
+          firstName,
+          lastName,
           username: email.split("@")[0],
           ageGroup,
           location,
-        }),
-      });
+        })
+      ),
+    });
 
-      if (!res.ok) {
-        const data = await res.json();
-        return { error: { message: data.detail || "Signup failed" } };
-      }
-
-      return { error: null };
-    } catch (err) {
-      return { error: { message: "Something went wrong" } };
+    if (!res.ok) {
+      const data = await res.json();
+      return { error: { message: data.detail || "Signup failed" } };
     }
-  };
+
+    return { error: null };
+  } catch (err) {
+    return { error: { message: "Something went wrong" } };
+  }
+};
 
   const signInWithGoogle = async () => {
     return { error: { message: "Google login not implemented" } };
@@ -200,16 +209,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     genres,
     languages,
     preferred,
+    ageGroup,
+    location
   }: {
-    hasCompletedOnboarding: boolean;
-    genres: string[];
-    languages: string[];
-    preferred: string;
+    hasCompletedOnboarding?: boolean;
+    genres?: string[];
+    languages?: string[];
+    preferred?: string;
+    ageGroup?: string;
+    location?: string;
   }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem("access_token");
       if (!token) return { error: { message: "Not authenticated" } };
+      const body: Record<string, unknown> = {};
+      if (hasCompletedOnboarding !== undefined)
+        body.hasCompletedOnboarding = hasCompletedOnboarding;
+      if (genres) body.genres = genres;
+      if (languages) body.languages = languages;
+      if (preferred !== undefined) body.preferred = preferred;
+      if (ageGroup) body.age_group = ageGroup;
+      if (location) body.location = location;
 
       const res = await fetch(`${BASE_URL}/api/me`, {
         method: "PATCH",
@@ -217,12 +238,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          hasCompletedOnboarding,
-          genres,
-          languages,
-          preferred,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -231,12 +247,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const data = await res.json();
-      setUser((prev: any) => ({
-        ...prev,
-        hasCompletedOnboarding: data.user.hasCompletedOnboarding,
-        genres: data.user.genres,
-        languages: data.user.languages,
-        preferred: data.user.preferred,
+      setUser((prev) => ({
+        ...(prev as User),
+        hasCompletedOnboarding:
+          data.user.hasCompletedOnboarding ?? prev.hasCompletedOnboarding,
+        genres: data.user.genres ?? prev.genres,
+        languages: data.user.languages ?? prev.languages,
+        preferred: data.user.preferred ?? prev.preferred,
+        ageGroup:
+          data.user.ageGroup ?? data.user.age_group ?? prev.ageGroup,
+        location: data.user.location ?? prev.location,
       }));
 
       return { error: null };

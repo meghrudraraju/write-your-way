@@ -43,7 +43,7 @@ const MoodSelect = () => {
       hasCompletedOnboarding: true,
       genres,
       languages,
-      preferred: selectedMood,
+      preferredMood: selectedMood,
     });
 
     if (!error) {

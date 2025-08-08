@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import axios from "@/lib/axios";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { toSnakeCaseKeys } from "@/lib/utils";
 
 const allGenres = ["Action", "Thriller", "Drama", "Romance", "Comedy", "Fantasy"];
 const allLanguages = [
@@ -95,7 +96,9 @@ useEffect(() => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -125,12 +128,17 @@ const handleSave = async () => {
   }
 
   try {
-    await axios.patch("/api/me", {
-      genres: form.genres,
-      languages: form.languages,
-      preferred: form.preferred || null,
-      hasCompletedOnboarding: !!form.hasCompletedOnboarding,
-    });
+    await axios.patch(
+      "/api/me",
+      toSnakeCaseKeys({
+        age_group: form.ageGroup,
+        location: form.location,
+        genres: form.genres,
+        languages: form.languages,
+        preferredMood: form.preferred || null,
+        hasCompletedOnboarding: !!form.hasCompletedOnboarding,
+      })
+    );
 
     alert("Profile updated!");
     navigate("/dashboard");
@@ -147,7 +155,7 @@ const handleSave = async () => {
         <h2 className="text-2xl font-bold mb-6 text-center">Edit Your Profile</h2>
 
         <div className="space-y-4">
-          {(["firstName", "lastName", "email", "ageGroup", "location"] as (keyof FormState)[]).map((field) => (
+          {(["firstName", "lastName", "email"] as (keyof FormState)[]).map((field) => (
             <input
               key={field}
               name={field}
@@ -158,6 +166,27 @@ const handleSave = async () => {
               className="w-full px-4 py-2 rounded-md border border-[#C29D54] bg-black text-[#C29D54] cursor-not-allowed opacity-60"
             />
           ))}
+          <select
+            name="ageGroup"
+            value={form.ageGroup}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded-md border border-[#C29D54] bg-black text-[#C29D54]"
+          >
+            <option value="">Select Age Group</option>
+            <option value="teen">Under 18</option>
+            <option value="young_adult">18–29</option>
+            <option value="adult">30–44</option>
+            <option value="senior">45+</option>
+          </select>
+
+          <input
+            name="location"
+            type="text"
+            placeholder="Location"
+            value={form.location}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded-md border border-[#C29D54] bg-black text-[#C29D54]"
+          />
 
           {/* Genre Multi-select */}
           <div ref={genreRef}>
